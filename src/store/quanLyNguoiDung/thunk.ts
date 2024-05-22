@@ -5,7 +5,7 @@ import { sleep } from "utils";
 
 export const registerThunk = createAsyncThunk(
     "quanLyNguoiDung/register",
-    async (payload: RegisterType, { rejectWithValue, dispatch, getState }) => {
+    async (payload: RegisterType, { rejectWithValue }) => {
         // data gửi lên từ dispatch chính là payload
         try {
             console.log("payload", payload);

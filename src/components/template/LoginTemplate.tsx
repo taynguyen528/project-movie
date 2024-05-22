@@ -42,7 +42,7 @@ export const LoginTemplate = () => {
 
     return (
         <form className="text-white" onSubmit={handleSubmit(onSubmit)}>
-            <h1 className="text-30 font-600">Đăng nhập</h1>
+            <h1 className="text-30 font-600 text-center">Đăng nhập</h1>
 
             <div className="mt-20">
                 <p className="mb-10">Tài khoản</p>
@@ -79,6 +79,21 @@ export const LoginTemplate = () => {
                 >
                     Đăng nhập
                 </Button>
+            </div>
+            <div className="text-right mt-20">
+                <span>Bạn chưa có tài khoản? </span>
+                <p
+                    className="inline-block cursor-pointer text-red-500 underline italic"
+                    onClick={() => navigate("/register")}
+                >
+                    Đăng ký
+                </p>
+                <span
+                    className="block cursor-pointer mt-[5px]"
+                    onClick={() => navigate("/")}
+                >
+                    Trở về trang chủ.
+                </span>
             </div>
         </form>
     );
