@@ -9,7 +9,5 @@ export const quanLyPhimServices = {
     getPhimList: () => api.get<HttpResponse<Phim[]>>("LayDanhSachPhim"),
     getMovieById: ({ query = "" } = {}) =>
         api.get<HttpResponse<Phim>>(`/LayThongTinPhim${query}`),
-    getCinemaMovieById: ({ query = "" } = {}) =>
-        api.get(`/LayThongTinLichChieuPhim${query}`),
     getBannerPhim: () => api.get("/LayDanhSachBanner"),
 };
