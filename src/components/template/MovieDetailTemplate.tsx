@@ -1,14 +1,78 @@
-import { useGetMovieInfo } from "hooks/apiHooks";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import { Rate, Tabs, Tag } from "antd";
+import { getCinemaMovieById } from "apis/movieApi";
+import { useGetMovieInfo } from "hooks/apiHooks";
 import { format } from "date-fns";
-import { Rate, Tag } from "antd";
 
 export const MovieDetailTemplate = () => {
+    const { movieId } = useParams<{ movieId: string }>();
     const { data } = useGetMovieInfo();
+    const [cinemaMovie, setCinemaMovie] = useState<any>({});
+    const [selectedCumRap, setSelectedCumRap] = useState<any>(null);
+    const [selectedLichChieu, setSelectedLichChieu] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                if (movieId) {
+                    const movieData = await getCinemaMovieById(movieId);
+                    setCinemaMovie(movieData);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, [movieId]);
 
     const formattedDate = data?.ngayKhoiChieu
         ? format(new Date(data.ngayKhoiChieu), "dd/MM/yyyy")
         : "";
+
+    const items = cinemaMovie?.heThongRapChieu?.map((heThongRap: any, index: number) => {
+        return {
+            label: (
+                <img
+                    style={{ width: 50 }}
+                    src={heThongRap.logo}
+                    alt={heThongRap.maHeThongRap}
+                />
+            ),
+            key: heThongRap.maHeThongRap.toString() + index,
+            children: (
+                <>
+                    {heThongRap.cumRapChieu.map((cumRap: any) => (
+                        <CumRapContainer
+                            key={cumRap.maCumRap}
+                            onClick={() => {
+                                setSelectedCumRap(cumRap);
+                                setSelectedLichChieu(null); // Reset selectedLichChieu when cumRap changes
+                            }}
+                        >
+                            <h4>{cumRap.tenCumRap}</h4>
+                            <ul>
+                                {cumRap.lichChieuPhim.map((lichChieu: any) => (
+                                    <LichChieuItem
+                                        key={lichChieu.maLichChieu}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent triggering cumRap click event
+                                            setSelectedLichChieu(lichChieu);
+                                        }}
+                                    >
+                                        <span>{format(new Date(lichChieu.ngayChieuGioChieu), "dd/MM/yyyy HH:mm")}</span>{" "}
+                                        <span>{lichChieu.tenRap}</span>
+                                    </LichChieuItem>
+                                ))}
+                            </ul>
+                        </CumRapContainer>
+                    ))}
+                </>
+            ),
+        };
+    });
 
     return (
         <>
@@ -40,7 +104,42 @@ export const MovieDetailTemplate = () => {
                                 />
                             </MovieInfoItem>
                             <hr />
-                            <CinemaInfo></CinemaInfo>
+                            <CinemaInfo>
+                                <TitleCinema>Hệ thống rạp chiếu</TitleCinema>
+                                <Tabs
+                                    style={{ height: 220 }}
+                                    defaultActiveKey="0"
+                                    items={items}
+                                />
+                            </CinemaInfo>
+                            {selectedCumRap && (
+                                <CinemaDetail>
+                                    <h3>Chi tiết cụm rạp</h3>
+                                    <div>
+                                        <h4>{selectedCumRap.tenCumRap}</h4>
+                                        <ul>
+                                            {selectedCumRap.lichChieuPhim.map((lichChieu: any) => (
+                                                <LichChieuItem
+                                                    key={lichChieu.maLichChieu}
+                                                    onClick={() => setSelectedLichChieu(lichChieu)}
+                                                >
+                                                    <span>{format(new Date(lichChieu.ngayChieuGioChieu), "dd/MM/yyyy HH:mm")}</span>{" "}
+                                                    <span>{lichChieu.tenRap}</span>
+                                                </LichChieuItem>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </CinemaDetail>
+                            )}
+                            {selectedLichChieu && (
+                                <LichChieuDetail>
+                                    <h3>Chi tiết lịch chiếu</h3>
+                                    <div>
+                                        <p>Ngày chiếu: {format(new Date(selectedLichChieu.ngayChieuGioChieu), "dd/MM/yyyy HH:mm")}</p>
+                                        <p>Rạp: {selectedLichChieu.tenRap}</p>
+                                    </div>
+                                </LichChieuDetail>
+                            )}
                         </div>
                     </MovieDetail>
                 </div>
@@ -99,4 +198,42 @@ const MovieInfoItem = styled.div`
     color: white;
 `;
 
-const CinemaInfo = styled.div``;
+const CinemaInfo = styled.div`
+    margin-top: 20px;
+`;
+
+const TitleCinema = styled.div`
+    font-size: 25px;
+    color: white;
+    margin-top: 30px;
+`;
+
+const CinemaDetail = styled.div`
+    margin-top: 20px;
+    padding: 20px;
+    background: #222;
+    border-radius: 8px;
+    color: white;
+`;
+
+const LichChieuDetail = styled.div`
+    margin-top: 20px;
+    padding: 20px;
+    background: #333;
+    border-radius: 8px;
+    color: white;
+`;
+
+const CumRapContainer = styled.div` 
+    border: 1px solid #444;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: white;
+    cursor: pointer;
+`;
+
+const LichChieuItem = styled.li`
+    color: white;
+    cursor: pointer;
+`;
+
