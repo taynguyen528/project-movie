@@ -64,7 +64,9 @@ export const RegisterTemplate = () => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <h1 className="text-white text-30 font-600 mb-[30px]">Đăng ký</h1>
+            <h1 className="text-white text-30 font-600 mb-[30px] text-center">
+                Đăng ký
+            </h1>
             <div className="text-white mb-4">Họ tên: </div>
             <Controller
                 control={control}
@@ -160,6 +162,21 @@ export const RegisterTemplate = () => {
                 >
                     Đăng ký
                 </Button>
+            </div>
+            <div className="text-right mt-20">
+                <span className="text-white">Bạn đã có tài khoản? </span>
+                <p
+                    className="inline-block cursor-pointer text-red-500 underline italic"
+                    onClick={() => navigate("/login")}
+                >
+                    Đăng nhập
+                </p>
+                <span
+                    className="block cursor-pointer mt-[5px] text-white"
+                    onClick={() => navigate("/")}
+                >
+                    Trở về trang chủ.
+                </span>
             </div>
         </form>
     );
