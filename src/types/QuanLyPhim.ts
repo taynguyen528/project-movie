@@ -12,3 +12,14 @@ export type Phim = {
     dangChieu: boolean;
     sapChieu: boolean;
 };
+
+export type InfoPhim = {
+    maLichChieu: number;
+    tenCumRap: string;
+    tenRap: string;
+    diaChi: string;
+    tenPhim: string;
+    hinhAnh: string;
+    ngayChieu: string;
+    gioChieu: string;
+};
