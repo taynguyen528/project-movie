@@ -12,18 +12,18 @@ export const MovieDetailTemplate = () => {
     const { data } = useGetMovieInfo();
     const [cinemaMovie, setCinemaMovie] = useState<any>({});
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (movieId) {
-                    const movieData = await getCinemaMovieById(movieId);
-                    setCinemaMovie(movieData);
-                }
-            } catch (error) {
-                console.error(error);
+    const fetchData = async () => {
+        try {
+            if (movieId) {
+                const movieData = await getCinemaMovieById(movieId);
+                setCinemaMovie(movieData);
             }
-        };
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
+    useEffect(() => {
         fetchData();
     }, [movieId]);
 

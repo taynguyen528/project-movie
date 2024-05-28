@@ -2,6 +2,7 @@ import { PATH } from "constant";
 import { AuthLayout, MainLayout } from "layouts";
 import { Home, Login, MovieDetail, Register, UserInfo } from "pages";
 import { RouteObject, useRoutes } from "react-router-dom";
+import { SelectSeatTemplate } from "template";
 
 const router: RouteObject[] = [
     {
@@ -31,6 +32,10 @@ const router: RouteObject[] = [
             {
                 path: PATH.movieDetail,
                 element: <MovieDetail />,
+            },
+            {
+                path: PATH.selectSeat,
+                element: <SelectSeatTemplate />,
             },
         ],
     },

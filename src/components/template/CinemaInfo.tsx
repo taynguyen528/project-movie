@@ -4,7 +4,8 @@ import { TreeSelect, Select, Modal, Button as AntButton } from "antd";
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import { RootState } from "store";
-import { useNavigate } from "react-router-dom";
+import { generatePath, useNavigate } from "react-router-dom";
+import { PATH } from "constant";
 
 const { TreeNode } = TreeSelect;
 const { Option } = Select;
@@ -13,12 +14,18 @@ export const CinemaInfo = (props: { cinemaMovie: any }) => {
     const { cinemaMovie } = props;
     const [selectedRap, setSelectedRap] = useState<string | undefined>();
     const [lichChieu, setLichChieu] = useState<any[]>([]);
-    const [selectedShowtime, setSelectedShowtime] = useState<string | undefined>();
+    const [selectedShowtime, setSelectedShowtime] = useState<
+        string | undefined
+    >();
     const [isBookingEnabled, setIsBookingEnabled] = useState<boolean>(false);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+    const [maLichChieu, setMaLichChieu] = useState<string | null>(null);
+
     const navigate = useNavigate();
 
-    const { userLogin } = useSelector((state: RootState) => state.quanLyNguoiDung);
+    const { userLogin } = useSelector(
+        (state: RootState) => state.quanLyNguoiDung
+    );
 
     useEffect(() => {
         if (selectedRap) {
@@ -46,17 +53,25 @@ export const CinemaInfo = (props: { cinemaMovie: any }) => {
         setSelectedShowtime(undefined);
     };
 
+    const handleShowtimeChange = (value: string) => {
+        setSelectedShowtime(value);
+        setMaLichChieu(value);
+    };
+
     const handleButton = () => {
         if (!userLogin) {
             setIsModalVisible(true);
         } else {
-            alert("123");
+            const path = generatePath(PATH.selectSeat, {
+                maLichChieu,
+            });
+            navigate(path);
         }
     };
 
     const handleOk = () => {
         setIsModalVisible(false);
-        navigate("/login")
+        navigate("/login");
     };
 
     const handleCancel = () => {
@@ -68,7 +83,6 @@ export const CinemaInfo = (props: { cinemaMovie: any }) => {
             <div>
                 <TitleCinema>Hệ thống rạp chiếu</TitleCinema>
                 <TreeSelect
-                    showSearch
                     style={{ width: "100%" }}
                     dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
                     placeholder="Chọn rạp"
@@ -85,7 +99,7 @@ export const CinemaInfo = (props: { cinemaMovie: any }) => {
                             {heThongRap.cumRapChieu.map((cumRap: any) => (
                                 <TreeNode
                                     value={cumRap.maCumRap}
-                                    title={cumRap.tenCumRap}
+                                    title={`${cumRap.tenCumRap} - ${cumRap.diaChi}`}
                                     key={cumRap.maCumRap}
                                 />
                             ))}
@@ -94,11 +108,10 @@ export const CinemaInfo = (props: { cinemaMovie: any }) => {
                 </TreeSelect>
             </div>
             <Select
-                showSearch
                 style={{ width: "100%", marginTop: "20px" }}
                 placeholder="Chọn suất chiếu"
                 value={selectedShowtime}
-                onChange={(value) => setSelectedShowtime(value)}
+                onChange={handleShowtimeChange}
             >
                 {lichChieu.map((lich: any) => (
                     <Option key={lich.maLichChieu} value={lich.maLichChieu}>
@@ -171,7 +184,7 @@ const StyledModal = styled(Modal)`
     .ant-modal-title {
         font-size: 24px !important;
     }
-    
+
     .ant-modal-content {
         font-size: 18px;
     }
@@ -181,4 +194,4 @@ const ModalContent = styled.p`
     font-size: 18px;
     height: 50px;
 `;
-
+           
