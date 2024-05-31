@@ -15,12 +15,16 @@ export const Navbar = () => {
     const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
+
+    const redirectHome = () => {
+        navigate('/')
+    }
     return (
         <Wrapper>
             <Container className="container mx-auto">
                 <LogoContainer>
-                    <img src="/images/logo.png" alt="logo" />
-                    <span className="text-[20px] font-700 text-white">
+                    <img src="/images/logo.png" alt="logo" onClick={redirectHome} className="cursor-pointer"/>
+                    <span className="text-[20px] font-700 text-white cursor-pointer"onClick={redirectHome} >
                         Cyber Movie
                     </span>
                 </LogoContainer>

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input } from "antd";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { LoginType, loginSchema } from "schemas";
 import { RootState, useAppDispatch } from "store";
@@ -19,13 +19,15 @@ export const LoginTemplate = () => {
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+
     const onSubmit: SubmitHandler<LoginType> = (data) => {
-        // console.log(data);
         dispatch(quanLyNguoiDungActionsThunks.loginThunk(data))
             .unwrap()
             .then(() => {
                 toast.success("Đăng nhập thành công!");
-                navigate("/");
+                const from = location.state?.from || "/";
+                navigate(from);
             })
             .catch((err) => {
                 toast.error(err.response.data.content);

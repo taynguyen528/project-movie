@@ -1,3 +1,5 @@
+import { ConfirmTicketTemplate } from "components/template/ConfirmTicketTemplate";
+import ProtectedRoute from "components/template/ProtectedRoute";
 import { PATH } from "constant";
 import { AuthLayout, MainLayout } from "layouts";
 import { Home, Login, MovieDetail, Register, UserInfo } from "pages";
@@ -34,8 +36,17 @@ const router: RouteObject[] = [
                 element: <MovieDetail />,
             },
             {
-                path: PATH.selectSeat,
-                element: <SelectSeatTemplate />,
+                element: <ProtectedRoute />,
+                children: [
+                    {
+                        path: PATH.selectSeat,
+                        element: <SelectSeatTemplate />,
+                    },
+                    {
+                        path: PATH.confirmTicket,
+                        element: <ConfirmTicketTemplate />,
+                    },
+                ],
             },
         ],
     },

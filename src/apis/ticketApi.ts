@@ -1,4 +1,5 @@
-import { QUAN_LY_PHONG_VE_API, QUAN_LY_RAP_API, apiInstance } from "constant";
+import { QUAN_LY_PHONG_VE_API, apiInstance } from "constant";
+import { DanhSachVe } from "types";
 
 const api = apiInstance.create({
     baseURL: QUAN_LY_PHONG_VE_API,
@@ -11,8 +12,33 @@ const getListBoxOffice = async (maLichChieu: string) => {
         );
         return res.data.content;
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
 };
 
-export { getListBoxOffice };
+const bookTicket = async (danhSachVe: DanhSachVe) => {
+    try {
+        const token = localStorage.getItem('USER') ? JSON.parse(localStorage.getItem('USER')!).accessToken : '';
+
+        if (!token) {
+            throw new Error('Không tìm thấy token');
+        }
+
+        const response = await api.post("/DatVe", {
+            maLichChieu: danhSachVe.maLichChieu,
+            danhSachVe: danhSachVe.danhSachVe,
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+
+export { getListBoxOffice, bookTicket };

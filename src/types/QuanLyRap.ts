@@ -4,3 +4,13 @@ export type Rap = {
     biDanh: string;
     logo: string;
 };
+
+export type Ve = {
+    maGhe: number;
+    giaVe: number;
+};
+
+export type DanhSachVe = {
+    maLichChieu: string;
+    danhSachVe: Ve[];
+};

@@ -3,5 +3,6 @@ export const PATH = {
     register: "/register",
     userInfo: "/userInfo",
     movieDetail: "/movie/:movieId",
-    selectSeat: '/selectSeat/:maLichChieu'
+    selectSeat: "/selectSeat/:maLichChieu",
+    confirmTicket: "/confirm-ticket/:maLichChieu",
 };
