@@ -191,7 +191,7 @@ export const ConfirmTicketTemplate = () => {
                                 <b>Xuất chiếu:</b> {bookingInfo?.xuatChieu}
                             </p>
                             <p>
-                                <b>Ngày chiếu:</b>
+                                <b>Ngày chiếu: </b>
                                 {bookingInfo?.ngayChieu +
                                     " - " +
                                     bookingInfo?.gioChieu}

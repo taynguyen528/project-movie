@@ -35,6 +35,7 @@ type VePhim = {
 };
 
 export type UserInfo = UserLogin & {
+    matKhau: string;
     loaiNguoiDung: {
         maLoaiNguoiDung: MaLoaiNguoiDung;
         tenLoai: "Quản Trị" | "Khách Hàng";
