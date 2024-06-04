@@ -1,5 +1,6 @@
 import { Tabs } from "antd";
 import { useGetUserInfo } from "hooks/apiHooks";
+import styled from "styled-components";
 import { TabUserInfo, TicketInfo } from "ui";
 
 const tabItems = [
@@ -27,12 +28,26 @@ export const UserInfoTemplate = () => {
     // B2: Set lại giá trị store redux đang lưu userLogin
 
     return (
-        <div>
-            <Tabs
-                // tabPosition={tabPosition}
-                tabPosition="left"
-                items={tabItems}
-            />
-        </div>
+        <UserInfoStyled>
+            <div className="container mx-auto">
+                <StyledTabs
+                    // tabPosition={tabPosition}
+                    tabPosition="top"
+                    items={tabItems}
+                />
+            </div>
+        </UserInfoStyled>
     );
 };
+
+const UserInfoStyled = styled.div`
+    background: #111018;
+`
+
+const StyledTabs = styled(Tabs)`
+    .ant-tabs-tab-btn {
+        font-size: 25px;
+        font-weight: 600;
+        color: white;
+    }
+`;

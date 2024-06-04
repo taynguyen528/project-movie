@@ -15,23 +15,29 @@ export const Navbar = () => {
     const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
+
+    const redirectHome = () => {
+        navigate("/");
+    };
+
     return (
         <Wrapper>
             <Container className="container mx-auto">
                 <LogoContainer>
-                    <img src="/images/logo.png" alt="logo" />
-                    <span className="text-[20px] font-700 text-white">
+                    <img
+                        src="/images/logo.png"
+                        alt="logo"
+                        onClick={redirectHome}
+                        className="cursor-pointer"
+                    />
+                    <span
+                        className="text-[20px] font-700 text-white cursor-pointer"
+                        onClick={redirectHome}
+                    >
                         Cyber Movie
                     </span>
                 </LogoContainer>
-                <div className="!flex gap-[30px]">
-                    <span className="cursor-pointer font-600 text-[20px] text-white">
-                        Lịch chiếu
-                    </span>
-                    <span className="cursor-pointer font-600 text-[20px] text-white">
-                        Cụm rạp
-                    </span>
-                </div>
+               
                 <Popover
                     trigger="click"
                     open={open}
@@ -55,9 +61,11 @@ export const Navbar = () => {
                             <Button
                                 type="primary"
                                 danger
-                                onClick={() =>
-                                    dispatch(quanLyNguoiDungActions.logOut())
-                                }
+                                onClick={() => {
+                                    dispatch(quanLyNguoiDungActions.logOut());
+                                    navigate("/");
+                                    setOpen(false);
+                                }}
                             >
                                 Đăng xuất
                             </Button>
@@ -72,7 +80,7 @@ export const Navbar = () => {
                     >
                         {!!userLogin && (
                             <>
-                                <Avatar icon={<IconUser />} />
+                                <StyledAvatar icon={<IconUser />} />
                                 <p className="text-white">{userLogin?.hoTen}</p>
                             </>
                         )}
@@ -149,5 +157,19 @@ const StyledButton = styled(Button)`
             background: yellow !important;
             color: #000 !important;
         }
+    }
+`;
+
+const StyledAvatar = styled(Avatar)`
+    && {
+        background: #fff;
+        border: 2px solid yellow;
+        font-size: 24px;
+        transition: ease-in-out 0.3s;
+    }
+
+    &&:hover {
+        background: yellow;
+        border-color: #fff;
     }
 `;
