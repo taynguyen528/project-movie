@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { getInfoUser } from "apis/userApi";
+import { getInfoUser, updateInfoUser } from "apis/userApi";
 import styled from "styled-components";
 import { UserInfo } from "types";
-import { useForm } from "react-hook-form";
-import { Input, Modal } from "antd";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { Modal } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import { toast } from "react-toastify";
 
-interface IUserUpdate {
+export interface IUserUpdate {
     taiKhoan: string;
     matKhau: string;
     email: string;
@@ -18,14 +19,13 @@ interface IUserUpdate {
 
 export const TabUserInfo = () => {
     const [userInfo, setUserInfo] = useState<UserInfo>();
-    const [infoBookTicket, setInfoBookTicket] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const fetchUserInfo = async () => {
         try {
             const res = await getInfoUser();
             setUserInfo(res.content);
-            setInfoBookTicket(res.content.thongTinDatVe);
         } catch (error) {
             console.log(error);
         }
@@ -50,8 +50,13 @@ export const TabUserInfo = () => {
         formState: { errors },
     } = useForm<IUserUpdate>();
 
-    const onSubmit = (data: IUserUpdate) => {
-        console.log(data);
+    const onSubmit: SubmitHandler<IUserUpdate> = async (data) => {
+        const result = await updateInfoUser(data);
+        if (result.statusCode) {
+            toast.success("Cập nhật thông tin thành công.");
+            setIsModalOpen(false);
+            fetchUserInfo();
+        }
     };
 
     return (
@@ -103,10 +108,16 @@ export const TabUserInfo = () => {
                                                 id="taiKhoan"
                                                 {...register("taiKhoan")}
                                                 defaultValue={
-                                                    userInfo?.taiKhoan || ""
+                                                    userInfo.taiKhoan || ""
                                                 }
                                                 disabled={true}
-                                                
+                                            />
+                                            <input
+                                                type="hidden"
+                                                {...register("taiKhoan")}
+                                                defaultValue={
+                                                    userInfo.taiKhoan || ""
+                                                }
                                             />
                                         </FormItem>
                                         <FormItem>
@@ -118,81 +129,146 @@ export const TabUserInfo = () => {
                                                 id="maNhom"
                                                 {...register("maNhom")}
                                                 defaultValue={
-                                                    userInfo?.maNhom || ""
+                                                    userInfo.maNhom || ""
                                                 }
                                                 disabled={true}
+                                            />
+                                            <input
+                                                type="hidden"
+                                                {...register("maNhom")}
+                                                defaultValue={
+                                                    userInfo.maNhom || ""
+                                                }
                                             />
                                         </FormItem>
                                         <FormItem>
                                             <label htmlFor="hoTen">
-                                                Họ tên:
+                                                Họ tên (<span>*</span>):
                                             </label>
                                             <InputStyled
                                                 type="text"
                                                 id="hoTen"
-                                                {...register("hoTen")}
+                                                {...register("hoTen", {
+                                                    required:
+                                                        "Họ tên không được để trống",
+                                                })}
                                                 defaultValue={
-                                                    userInfo?.hoTen || ""
+                                                    userInfo.hoTen || ""
                                                 }
                                             />
+                                            {errors.hoTen && (
+                                                <ErrorMsg>
+                                                    {errors.hoTen.message}
+                                                </ErrorMsg>
+                                            )}
                                         </FormItem>
                                         <FormItem>
                                             <label htmlFor="email">
-                                                Email:
+                                                Email (<span>*</span>):
                                             </label>
                                             <InputStyled
                                                 type="email"
                                                 id="email"
-                                                {...register("email")}
+                                                {...register("email", {
+                                                    required:
+                                                        "Email không được để trống",
+                                                })}
                                                 defaultValue={
-                                                    userInfo?.email || ""
+                                                    userInfo.email || ""
                                                 }
                                             />
+                                            {errors.email && (
+                                                <ErrorMsg>
+                                                    {errors.email.message}
+                                                </ErrorMsg>
+                                            )}
                                         </FormItem>
                                         <FormItem>
                                             <label htmlFor="matKhau">
-                                                Mật khẩu:
+                                                Mật khẩu (<span>*</span>):
                                             </label>
-                                            <PasswordInputStyled
-                                                id="matKhau"
-                                                {...register("matKhau")}
-                                                defaultValue={
-                                                    userInfo?.matKhau || ""
-                                                }
-                                                iconRender={(visible) =>
-                                                    visible ? (
-                                                        <EyeTwoTone />
-                                                    ) : (
-                                                        <EyeInvisibleOutlined />
-                                                    )
-                                                }
-                                            />
+                                            <InputWrapper>
+                                                <InputStyled
+                                                    type={
+                                                        showPassword
+                                                            ? "text"
+                                                            : "password"
+                                                    }
+                                                    id="matKhau"
+                                                    {...register("matKhau", {
+                                                        required:
+                                                            "Mật khẩu không được để trống",
+                                                    })}
+                                                    defaultValue={
+                                                        userInfo.matKhau || ""
+                                                    }
+                                                />
+                                                {showPassword ? (
+                                                    <EyeTwoTone
+                                                        onClick={() =>
+                                                            setShowPassword(
+                                                                !showPassword
+                                                            )
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <EyeInvisibleOutlined
+                                                        onClick={() =>
+                                                            setShowPassword(
+                                                                !showPassword
+                                                            )
+                                                        }
+                                                    />
+                                                )}
+                                            </InputWrapper>
+                                            {errors.matKhau && (
+                                                <ErrorMsg>
+                                                    {errors.matKhau.message}
+                                                </ErrorMsg>
+                                            )}
                                         </FormItem>
                                         <FormItem>
-                                            <label htmlFor="soDienThoai">
-                                                Số điện thoại:
+                                            <label htmlFor="soDt">
+                                                Số điện thoại (<span>*</span>):
                                             </label>
                                             <InputStyled
                                                 type="tel"
-                                                id="soDienThoai"
-                                                {...register("soDt")}
+                                                id="soDt"
+                                                {...register("soDt", {
+                                                    required:
+                                                        "Số điện thoại không được để trống",
+                                                })}
                                                 defaultValue={
-                                                    userInfo?.soDT || ""
+                                                    userInfo.soDT || ""
                                                 }
                                             />
+                                            {errors.soDt && (
+                                                <ErrorMsg>
+                                                    {errors.soDt.message}
+                                                </ErrorMsg>
+                                            )}
                                         </FormItem>
                                         <FormItem>
                                             <label htmlFor="maLoaiNguoiDung">
-                                                Loại người dùng
+                                                Loại người dùng:
                                             </label>
                                             <InputStyled
                                                 type="text"
                                                 id="maLoaiNguoiDung"
                                                 {...register("maLoaiNguoiDung")}
                                                 defaultValue={
-                                                    userInfo?.maLoaiNguoiDung || ""
+                                                    userInfo.maLoaiNguoiDung ||
+                                                    ""
                                                 }
                                                 disabled={true}
+                                            />
+                                            <input
+                                                type="hidden"
+                                                {...register("maLoaiNguoiDung")}
+                                                defaultValue={
+                                                    userInfo.maLoaiNguoiDung ||
+                                                    ""
+                                                }
                                             />
                                         </FormItem>
                                     </FormGrid>
@@ -274,8 +350,6 @@ const FormGrid = styled.div`
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     margin-bottom: 20px;
-
-    
 `;
 
 const FormItem = styled.div`
@@ -286,14 +360,25 @@ const FormItem = styled.div`
         font-size: 20px;
         font-weight: bold;
         margin: 5px;
+
+        span {
+            color: red;
+        }
     }
 `;
 
-const InputStyled = styled(Input)`
-    padding: 10px 20px !important;
-    font-size: 20px !important;
-    background: #fff !important;
+const InputStyled = styled.input`
+    padding: 10px 20px;
+    font-size: 20px;
+    background: #fff;
     color: #000;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+
+    &:disabled {
+        background: #f0f0f0;
+        cursor: not-allowed;
+    }
 `;
 
 const TitleModalStyled = styled.div`
@@ -302,9 +387,20 @@ const TitleModalStyled = styled.div`
     text-align: center;
 `;
 
-const PasswordInputStyled = styled(Input.Password)`
-    padding: 10px 20px !important;
-    font-size: 20px !important;
-    background: #fff !important;
-    color: #000;
+const ErrorMsg = styled.p`
+    color: red;
+    font-size: 18px;
+    margin: 5px 0 0;
+`;
+
+const InputWrapper = styled.div`
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .anticon {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
+    }
 `;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button, Card, Skeleton, Modal } from "antd";
 import { PATH } from "constant";
 import { useGetPhimList } from "hooks/apiHooks";
@@ -108,16 +108,16 @@ const ListMovie = () => {
 
 export default ListMovie;
 
+const MovieList = styled.div`
+    background: #111018;
+    padding: 20px;
+`;
+
 const Title = styled.div`
     color: #fff;
     font-size: 30px;
     font-weight: 700;
     margin: 20px 0;
-`;
-
-const MovieList = styled.div`
-    background: #111018;
-    padding: 20px;
 `;
 
 const SkeletonGrid = styled.div`
