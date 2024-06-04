@@ -52,21 +52,6 @@ export const SelectSeatTemplate = () => {
             .reduce((total, chair) => total + chair.giaVe, 0);
     };
 
-    // const handleBookTicket = () => {
-    //     const path = generatePath(PATH.confirmTicket, {
-    //         maLichChieu,
-    //     });
-    //     navigate(path, {
-    //         state: {
-    //             infoMovie,
-    //             selectedSeats,
-    //             totalPrice: calculateTotalPrice(),
-    //             listChair,
-    //             maLichChieu
-    //         },
-    //     });
-    // };
-
     const handleBookTicket = () => {
         setIsLoading(true);
         setTimeout(() => {
