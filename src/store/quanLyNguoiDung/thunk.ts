@@ -8,7 +8,7 @@ export const registerThunk = createAsyncThunk(
     async (payload: RegisterType, { rejectWithValue }) => {
         // data gửi lên từ dispatch chính là payload
         try {
-            console.log("payload", payload);
+            // console.log("payload", payload);
 
             // sleep thêm 1s
             await sleep();
@@ -27,7 +27,7 @@ export const loginThunk = createAsyncThunk(
     "quanLyNguoiDung/login",
     async (payload: LoginType, { rejectWithValue }) => {
         try {
-            console.log("payload", payload);
+            // console.log("payload", payload);
 
             // sleep thêm 1s
             await sleep();

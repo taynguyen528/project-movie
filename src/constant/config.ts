@@ -5,4 +5,5 @@ export const PATH = {
     movieDetail: "/movie/:movieId",
     selectSeat: "/selectSeat/:maLichChieu",
     confirmTicket: "/confirm-ticket/:maLichChieu",
+    admin: "/admin",
 };
