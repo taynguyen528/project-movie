@@ -1,5 +1,7 @@
 import { ConfirmTicketTemplate } from "components/template/ConfirmTicketTemplate";
 import ProtectedRoute from "components/template/ProtectedRoute";
+import { ProtectedRouteAdmin } from "components/template/ProtectedRouteAdmin";
+import { DashBoardAdmin } from "components/template/admin/DashBoardAdmin";
 import { PATH } from "constant";
 import { AuthLayout, MainLayout } from "layouts";
 import { Home, Login, MovieDetail, Register, UserInfo } from "pages";
@@ -27,10 +29,7 @@ const router: RouteObject[] = [
                 path: "/",
                 element: <Home />,
             },
-            {
-                path: PATH.userInfo,
-                element: <UserInfo />,
-            },
+
             {
                 path: PATH.movieDetail,
                 element: <MovieDetail />,
@@ -45,6 +44,19 @@ const router: RouteObject[] = [
                     {
                         path: PATH.confirmTicket,
                         element: <ConfirmTicketTemplate />,
+                    },
+                    {
+                        path: PATH.userInfo,
+                        element: <UserInfo />,
+                    },
+                ],
+            },
+            {
+                element: <ProtectedRouteAdmin />,
+                children: [
+                    {
+                        path: PATH.admin,
+                        element: <DashBoardAdmin />,
                     },
                 ],
             },

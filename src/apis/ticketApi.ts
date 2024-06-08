@@ -1,3 +1,4 @@
+import { FormDataShowTime } from "components/template/admin/ShowTimeModal";
 import { QUAN_LY_PHONG_VE_API, apiInstance } from "constant";
 import { DanhSachVe } from "types";
 
@@ -18,19 +19,48 @@ const getListBoxOffice = async (maLichChieu: string) => {
 
 const bookTicket = async (danhSachVe: DanhSachVe) => {
     try {
-        const token = localStorage.getItem('USER') ? JSON.parse(localStorage.getItem('USER')!).accessToken : '';
+        const token = localStorage.getItem("USER")
+            ? JSON.parse(localStorage.getItem("USER")!).accessToken
+            : "";
 
         if (!token) {
-            throw new Error('Không tìm thấy token');
+            throw new Error("Không tìm thấy token");
         }
 
-        const response = await api.post("/DatVe", {
-            maLichChieu: danhSachVe.maLichChieu,
-            danhSachVe: danhSachVe.danhSachVe,
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        const response = await api.post(
+            "/DatVe",
+            {
+                maLichChieu: danhSachVe.maLichChieu,
+                danhSachVe: danhSachVe.danhSachVe,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
             }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+};
+
+const createShowTime = async (formData: FormDataShowTime) => {
+    try {
+        const token = localStorage.getItem("USER")
+            ? JSON.parse(localStorage.getItem("USER")!).accessToken
+            : "";
+
+        if (!token) {
+            throw new Error("Không tìm thấy token");
+        }
+
+        const response = await api.post("/TaoLichChieu", formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         });
 
         return response.data;
@@ -40,5 +70,4 @@ const bookTicket = async (danhSachVe: DanhSachVe) => {
     }
 };
 
-
-export { getListBoxOffice, bookTicket };
+export { getListBoxOffice, bookTicket, createShowTime };

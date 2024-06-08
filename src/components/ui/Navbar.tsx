@@ -37,7 +37,7 @@ export const Navbar = () => {
                         Cyber Movie
                     </span>
                 </LogoContainer>
-               
+
                 <Popover
                     trigger="click"
                     open={open}
@@ -48,15 +48,26 @@ export const Navbar = () => {
                     className="cursor-pointer"
                     content={
                         <div>
-                            <Button
-                                type="text"
-                                onClick={() => {
-                                    navigate(PATH.userInfo);
-                                    setOpen(false);
-                                }}
-                            >
-                                Thông tin tài khoản
-                            </Button>
+                            <WrapButton>
+                                <Button
+                                    type="text"
+                                    onClick={() => {
+                                        navigate(PATH.userInfo);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    Thông tin tài khoản
+                                </Button>
+                                <Button
+                                    type="text"
+                                    onClick={() => {
+                                        navigate(PATH.admin);
+                                        setOpen(false);
+                                    }}
+                                >
+                                    Trang quản trị (ADMIN)
+                                </Button>
+                            </WrapButton>
                             <Divider className="py-10" />
                             <Button
                                 type="primary"
@@ -172,4 +183,9 @@ const StyledAvatar = styled(Avatar)`
         background: yellow;
         border-color: #fff;
     }
+`;
+
+const WrapButton = styled.div`
+    display: flex;
+    flex-direction: column;
 `;

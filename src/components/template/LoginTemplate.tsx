@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input } from "antd";
+import { LOCALE_USER_LOGIN_KEY } from "constant";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useNavigate, Navigate, useLocation } from "react-router-dom";
@@ -21,17 +22,25 @@ export const LoginTemplate = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const onSubmit: SubmitHandler<LoginType> = (data) => {
-        dispatch(quanLyNguoiDungActionsThunks.loginThunk(data))
-            .unwrap()
-            .then(() => {
-                toast.success("Đăng nhập thành công!");
-                const from = location.state?.from || "/";
+    const onSubmit: SubmitHandler<LoginType> = async (data) => {
+        try {
+            await dispatch(
+                quanLyNguoiDungActionsThunks.loginThunk(data)
+            ).unwrap();
+            const userLoginData = localStorage.getItem(LOCALE_USER_LOGIN_KEY);
+            const checkAdmin = userLoginData
+                ? JSON.parse(userLoginData).maLoaiNguoiDung
+                : "";
+            const from = location.state?.from || "/";
+            if (checkAdmin === "QuanTri") {
+                navigate("/admin");
+            } else {
                 navigate(from);
-            })
-            .catch((err) => {
-                toast.error(err.response.data.content);
-            });
+            }
+            toast.success("Đăng nhập thành công!");
+        } catch (err: any) {
+            toast.error(err.response.data.content);
+        }
     };
 
     const { isFetchingLogin, userLogin } = useSelector(
