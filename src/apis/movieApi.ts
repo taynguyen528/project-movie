@@ -1,4 +1,3 @@
-import { MovieFormData } from "components/template/admin/AddMovieModal";
 import { FormDataUpdate } from "components/template/admin/UpdateMovieModal";
 import { QUAN_LY_PHIM_API, QUAN_LY_RAP_API, apiInstance } from "constant";
 
@@ -58,8 +57,7 @@ const getListMovie = async (maNhom: string = MA_NHOM) => {
     }
 };
 
-
-const addNewMovie = async (data: MovieFormData) => {
+const addNewMovie = async (data: any) => {
     try {
         const res = await apiMovie.post("/ThemPhimUploadHinh", data);
         return res.data;
@@ -69,7 +67,7 @@ const addNewMovie = async (data: MovieFormData) => {
     }
 };
 
-const updateMovieByAdmin = async (data: FormDataUpdate) => {
+const updateMovieByAdmin = async (data: any) => {
     try {
         const token = localStorage.getItem("USER")
             ? JSON.parse(localStorage.getItem("USER")!).accessToken

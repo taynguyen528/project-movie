@@ -8,6 +8,7 @@ import {
     InputNumber,
     Upload,
     Button,
+    UploadFile,
 } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { UploadOutlined } from "@ant-design/icons";
@@ -31,6 +32,7 @@ export interface MovieFormData {
     hot: boolean;
     danhGia: number;
     hinhAnh: File[];
+    trailer: string;
 }
 
 export const AddMovieModal: React.FC<AddMovieModalProps> = ({
@@ -38,7 +40,7 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
     onOk,
     onCancel,
 }) => {
-    const { control, handleSubmit, reset } = useForm();
+    const { control, handleSubmit, reset } = useForm<MovieFormData>();
 
     const onSubmit = async (data: any) => {
         const formData = new FormData();
@@ -61,7 +63,7 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
                 onOk();
                 reset();
             }
-        } catch (error:any) {
+        } catch (error: any) {
             toast.error(error.response.data.content);
         }
     };
@@ -86,7 +88,7 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
             footer={null}
             width={800}
         >
-            <StyledForm layout="vertical" onFinish={handleSubmit(onSubmit)}>
+            <StyledForm onSubmit={handleSubmit(onSubmit)}>
                 <FormRow>
                     <FormItem
                         label="Tên phim"
@@ -104,14 +106,24 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
                             render={({ field }) => <Input {...field} />}
                         />
                     </FormItem>
-                    <FormItem label="Trailer">
-                        <Controller
-                            name="trailer"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => <Input {...field} />}
-                        />
-                    </FormItem>
+                    <FormRow>
+                        <FormItem
+                            label="Trailer"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Vui lòng nhập trailer!",
+                                },
+                            ]}
+                        >
+                            <Controller
+                                name="trailer"
+                                control={control}
+                                defaultValue=""
+                                render={({ field }) => <Input {...field} />}
+                            />
+                        </FormItem>
+                    </FormRow>
                 </FormRow>
                 <FormRow>
                     <FormItem
@@ -143,7 +155,7 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
                         <Controller
                             name="ngayKhoiChieu"
                             control={control}
-                            defaultValue={null}
+                            defaultValue=""
                             render={({ field }) => (
                                 <DatePicker
                                     {...field}
@@ -207,12 +219,50 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
                             render={({ field }) => (
                                 <Upload
                                     name="hinhAnh"
-                                    fileList={field.value}
+                                    fileList={
+                                        Array.isArray(field.value)
+                                            ? (field.value
+                                                  .map(
+                                                      (
+                                                          file:
+                                                              | File
+                                                              | UploadFile<any>,
+                                                          index: number
+                                                      ) => {
+                                                          if (
+                                                              "originFileObj" in
+                                                                  file &&
+                                                              file.originFileObj &&
+                                                              file.type &&
+                                                              file.type.startsWith(
+                                                                  "image/"
+                                                              )
+                                                          ) {
+                                                              return {
+                                                                  uid: index.toString(),
+                                                                  name: file.name,
+                                                                  status: "done",
+                                                                  url: URL.createObjectURL(
+                                                                      file.originFileObj
+                                                                  ),
+                                                              };
+                                                          } else {
+                                                              return null;
+                                                          }
+                                                      }
+                                                  )
+                                                  .filter(
+                                                      (item) => item !== null
+                                                  ) as UploadFile<any>[])
+                                            : []
+                                    }
                                     listType="picture"
                                     beforeUpload={beforeUpload}
-                                    onChange={({ fileList }) =>
-                                        field.onChange(fileList)
-                                    }
+                                    onChange={({ fileList }) => {
+                                        if (Array.isArray(fileList)) {
+                                            field.onChange(fileList);
+                                        }
+                                    }}
                                 >
                                     <Button icon={<UploadOutlined />}>
                                         Chọn file
@@ -234,7 +284,7 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
     );
 };
 
-const StyledForm = styled(Form)`
+const StyledForm = styled.form`
     .ant-form-item {
         margin-bottom: 16px;
     }
