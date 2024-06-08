@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
     Modal,
     Button,
@@ -8,293 +8,276 @@ import {
     Input,
     DatePicker,
     InputNumber,
+    UploadFile,
 } from "antd";
 import styled from "styled-components";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { UploadOutlined } from "@ant-design/icons";
-import { Phim } from "types";
 import moment from "moment";
 import { toast } from "react-toastify";
 import { updateMovieByAdmin } from "apis/movieApi";
+import { Phim } from "types";
 
 interface Props {
     visible: boolean;
     onOk: () => void;
     onClose: () => void;
     fetchData: () => void;
-    movieEdit: Phim;
+    idMovieEdit: number | undefined;
+    movieEdit: Phim | undefined;
 }
 
 export interface FormDataUpdate {
-    maPhim: string;
+    maPhim: number | undefined;
     tenPhim: string;
     moTa: string;
-    ngayKhoiChieu: string;
+    ngayKhoiChieu: string | moment.Moment | null;
     sapChieu: boolean;
     dangChieu: boolean;
     hot: boolean;
+    trailer: string;
     danhGia: number;
-    hinhAnh: Blob[];
+    hinhAnh?: UploadFile;
 }
 
 export const UpdateMovieModal: React.FC<Props> = ({
     visible,
-    fetchData,
     onOk,
     onClose,
+    fetchData,
+    idMovieEdit,
     movieEdit,
 }) => {
+    const [form] = Form.useForm();
+
     const {
         handleSubmit,
-        reset,
         control,
+        setValue,
+        reset,
         formState: { errors },
-    } = useForm<FormDataUpdate>();
-
-    // console.log("movieEdit", movieEdit);
+    } = useForm<FormDataUpdate>({
+        defaultValues: {
+            maPhim: idMovieEdit,
+            tenPhim: "",
+            moTa: "",
+            ngayKhoiChieu: null,
+            sapChieu: false,
+            dangChieu: false,
+            hot: false,
+            trailer: "",
+            danhGia: 0,
+            hinhAnh: undefined,
+        },
+    });
 
     useEffect(() => {
-        reset({
-            tenPhim: movieEdit ? movieEdit.tenPhim : "",
-            moTa: movieEdit ? movieEdit.moTa : "",
-            ngayKhoiChieu: movieEdit ? movieEdit.ngayKhoiChieu : null,
-            danhGia: movieEdit ? movieEdit.danhGia : 1,
-            dangChieu: movieEdit ? movieEdit.dangChieu : false,
-            sapChieu: movieEdit ? movieEdit.sapChieu : false,
-            hot: movieEdit ? movieEdit.hot : false,
-            hinhAnh: movieEdit ? movieEdit.hinhAnh : [],
-        });
-    }, [movieEdit, reset]);
+        if (visible) {
+            reset({
+                maPhim: idMovieEdit,
+                tenPhim: movieEdit?.tenPhim || "",
+                moTa: movieEdit?.moTa || "",
+                ngayKhoiChieu: moment(movieEdit?.ngayKhoiChieu) || null,
+                sapChieu: movieEdit?.sapChieu || false,
+                dangChieu: movieEdit?.dangChieu || false,
+                hot: movieEdit?.hot || false,
+                trailer: movieEdit?.trailer || "",
+                danhGia: movieEdit?.danhGia || 0,
+                hinhAnh: undefined,
+            });
+        }
+    }, [visible, movieEdit, reset]);
 
-    const onSubmit: SubmitHandler<FormDataUpdate> = async (
-        data: FormDataUpdate
-    ) => {
+    const onSubmit: SubmitHandler<FormDataUpdate> = async (values) => {
         const formData = new FormData();
-        formData.append("tenPhim", data.tenPhim);
-        formData.append("moTa", data.moTa);
-        formData.append("ngayKhoiChieu", data.ngayKhoiChieu);
-        formData.append("sapChieu", data.sapChieu);
-        formData.append("dangChieu", data.dangChieu);
-        formData.append("hot", data.hot);
-        formData.append("danhGia", data.danhGia);
-        formData.append("maPhim", movieEdit.maPhim);
-        formData.append("File", data.hinhAnh[0].originFileObj);
+        formData.append("maPhim", values.maPhim?.toString() || "");
+        formData.append("tenPhim", values.tenPhim);
+        formData.append("moTa", values.moTa);
+        formData.append(
+            "ngayKhoiChieu",
+            (values.ngayKhoiChieu as moment.Moment).format("DD/MM/YYYY")
+        );
+        formData.append("sapChieu", values.sapChieu.toString());
+        formData.append("dangChieu", values.dangChieu.toString());
+        formData.append("hot", values.hot.toString());
+        formData.append("trailer", values.trailer);
+        formData.append("danhGia", values.danhGia.toString());
+        if (values.hinhAnh) {
+            formData.append("File", values.hinhAnh as any);
+        }
 
         try {
             const res = await updateMovieByAdmin(formData);
-            if (res && res.statusCode === 200) {
-                toast.success(res.message);
+            if (res.statusCode === 200) {
+                toast.success("Cập nhật phim thành công");
+                fetchData();
                 onOk();
-                reset();
+                onClose();
             }
         } catch (error: any) {
             toast.error(error.response.data.content);
         }
     };
 
-    const beforeUpload = (file: any) => {
-        const isJpgOrPng =
-            file.type === "image/jpeg" || file.type === "image/png";
-        if (!isJpgOrPng) {
-            toast.error("Bạn chỉ có thể tải lên tệp JPG/PNG!");
-        }
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) {
-            toast.error("Hình ảnh phải nhỏ hơn 2MB!");
-        }
-        return isJpgOrPng && isLt2M;
-    };
-
     return (
         <Modal
-            title={<Title>Chỉnh sửa phim</Title>}
+            title="Cập nhật phim"
             open={visible}
+            onOk={form.submit}
             onCancel={onClose}
-            footer={null}
-            width={800}
+            footer={[
+                <Button key="back" onClick={onClose}>
+                    Hủy
+                </Button>,
+                <Button
+                    key="submit"
+                    type="primary"
+                    onClick={handleSubmit(onSubmit)}
+                >
+                    Cập nhật
+                </Button>,
+            ]}
         >
-            <StyledForm layout="vertical" onFinish={handleSubmit(onSubmit)}>
-                <FormRow>
-                    <FormItem
-                        label="Tên phim"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Vui lòng nhập tên phim!",
-                            },
-                        ]}
-                    >
-                        <Controller
-                            name="tenPhim"
-                            control={control}
-                            render={({ field }) => <Input {...field} />}
-                        />
-                    </FormItem>
-                </FormRow>
-                <FormRow>
-                    <FormItem
-                        label="Mô tả"
-                        rules={[
-                            { required: true, message: "Vui lòng nhập mô tả!" },
-                        ]}
-                    >
-                        <Controller
-                            name="moTa"
-                            control={control}
-                            render={({ field }) => (
-                                <Input.TextArea {...field} />
-                            )}
-                        />
-                    </FormItem>
-                </FormRow>
-                <FormRow>
-                    <FormItem
-                        label="Ngày khởi chiếu"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Vui lòng chọn ngày khởi chiếu!",
-                            },
-                        ]}
-                    >
-                        <Controller
-                            name="ngayKhoiChieu"
-                            control={control}
-                            render={({ field }) => (
-                                <DatePicker
-                                    {...field}
-                                    format="DD/MM/YYYY"
-                                    value={
-                                        field.value ? moment(field.value) : null
-                                    }
-                                    onChange={(date) =>
-                                        field.onChange(
-                                            date
-                                                ? date.format("YYYY-MM-DD")
-                                                : null
-                                        )
-                                    }
-                                />
-                            )}
-                        />
-                    </FormItem>
-                    <FormItem
-                        label="Số sao"
-                        rules={[
-                            {
-                                required: true,
-                                message: "Vui lòng nhập số sao!",
-                            },
-                        ]}
-                    >
-                        <Controller
-                            name="danhGia"
-                            control={control}
-                            render={({ field }) => (
-                                <InputNumber {...field} min={1} max={10} />
-                            )}
-                        />
-                    </FormItem>
-                </FormRow>
-                <FormRow>
-                    <FormItem label="Đang chiếu" valuePropName="checked">
-                        <Controller
-                            name="dangChieu"
-                            control={control}
-                            render={({ field }) => <Switch {...field} />}
-                        />
-                    </FormItem>
-                    <FormItem label="Sắp chiếu" valuePropName="checked">
-                        <Controller
-                            name="sapChieu"
-                            control={control}
-                            render={({ field }) => <Switch {...field} />}
-                        />
-                    </FormItem>
-                    <FormItem label="Hot" valuePropName="checked">
-                        <Controller
-                            name="hot"
-                            control={control}
-                            render={({ field }) => <Switch {...field} />}
-                        />
-                    </FormItem>
-                </FormRow>
-
-                <FormRow>
-                    <FormItem label="Hình ảnh">
-                        <Controller
-                            name="hinhAnh"
-                            control={control}
-                            defaultValue={[]}
-                            render={({ field }) => (
-                                <Upload
-                                    name="hinhAnh"
-                                    fileList={
-                                        Array.isArray(field.value)
-                                            ? field.value
-                                            : []
-                                    }
-                                    listType="picture"
-                                    beforeUpload={beforeUpload}
-                                    onChange={({ fileList }) => {
-                                        if (Array.isArray(fileList)) {
-                                            field.onChange(fileList);
-                                        }
-                                    }}
-                                >
-                                    <Button icon={<UploadOutlined />}>
-                                        Chọn file
-                                    </Button>
-                                </Upload>
-                            )}
-                        />
-                    </FormItem>
-                </FormRow>
-
-                <Form.Item>
-                    <WrapButton>
-                        <Button type="primary" htmlType="submit">
-                            Cập nhật
-                        </Button>
-                    </WrapButton>
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit(onSubmit)}
+            >
+                <Form.Item label="Mã phim">
+                    <Controller
+                        name="maPhim"
+                        control={control}
+                        rules={{ required: "Mã phim không được bỏ trống" }}
+                        render={({ field }) => (
+                            <Input
+                                {...field}
+                                disabled
+                                value={idMovieEdit?.toString() || ""}
+                            />
+                        )}
+                    />
+                    {errors.maPhim && (
+                        <ErrorText>{errors.maPhim.message}</ErrorText>
+                    )}
                 </Form.Item>
-            </StyledForm>
+                <Form.Item label="Tên phim">
+                    <Controller
+                        name="tenPhim"
+                        control={control}
+                        rules={{ required: "Tên phim không được bỏ trống" }}
+                        render={({ field }) => <Input {...field} />}
+                    />
+                    {errors.tenPhim && (
+                        <ErrorText>{errors.tenPhim.message}</ErrorText>
+                    )}
+                </Form.Item>
+                <Form.Item label="Mô tả">
+                    <Controller
+                        name="moTa"
+                        control={control}
+                        rules={{ required: "Mô tả không được bỏ trống" }}
+                        render={({ field }) => <Input.TextArea {...field} />}
+                    />
+                    {errors.moTa && (
+                        <ErrorText>{errors.moTa.message}</ErrorText>
+                    )}
+                </Form.Item>
+                <Form.Item label="Ngày khởi chiếu">
+                    <Controller
+                        name="ngayKhoiChieu"
+                        control={control}
+                        rules={{
+                            required: "Ngày khởi chiếu không được bỏ trống",
+                        }}
+                        render={({ field }) => (
+                            <DatePicker
+                                {...field}
+                                format="DD/MM/YYYY"
+                                value={field.value ? moment(field.value) : null}
+                            />
+                        )}
+                    />
+                    {errors.ngayKhoiChieu && (
+                        <ErrorText>{errors.ngayKhoiChieu.message}</ErrorText>
+                    )}
+                </Form.Item>
+                <Form.Item label="Sắp chiếu">
+                    <Controller
+                        name="sapChieu"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch {...field} checked={field.value} />
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item label="Đang chiếu">
+                    <Controller
+                        name="dangChieu"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch {...field} checked={field.value} />
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item label="Hot">
+                    <Controller
+                        name="hot"
+                        control={control}
+                        render={({ field }) => (
+                            <Switch {...field} checked={field.value} />
+                        )}
+                    />
+                </Form.Item>
+                <Form.Item label="Trailer">
+                    <Controller
+                        name="trailer"
+                        control={control}
+                        rules={{ required: "Trailer không được bỏ trống" }}
+                        render={({ field }) => <Input {...field} />}
+                    />
+                    {errors.trailer && (
+                        <ErrorText>{errors.trailer.message}</ErrorText>
+                    )}
+                </Form.Item>
+                <Form.Item label="Đánh giá">
+                    <Controller
+                        name="danhGia"
+                        control={control}
+                        rules={{ required: "Đánh giá không được bỏ trống" }}
+                        render={({ field }) => (
+                            <InputNumber {...field} min={0} max={10} />
+                        )}
+                    />
+                    {errors.danhGia && (
+                        <ErrorText>{errors.danhGia.message}</ErrorText>
+                    )}
+                </Form.Item>
+                <Form.Item label="Hình ảnh">
+                    <Controller
+                        name="hinhAnh"
+                        control={control}
+                        render={({ field }) => (
+                            <Upload
+                                {...field}
+                                beforeUpload={(file) => {
+                                    setValue("hinhAnh", file);
+                                    return false;
+                                }}
+                                onRemove={() => setValue("hinhAnh", undefined)}
+                            >
+                                <Button icon={<UploadOutlined />}>
+                                    Upload
+                                </Button>
+                            </Upload>
+                        )}
+                    />
+                </Form.Item>
+            </Form>
         </Modal>
     );
 };
 
-const StyledForm = styled(Form)`
-    .ant-form-item {
-        margin-bottom: 16px;
-    }
-`;
-
-const FormRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    @media (max-width: 768px) {
-        flex-direction: column;
-    }
-`;
-
-const FormItem = styled(Form.Item)`
-    flex: 1;
-    &:first-child {
-        margin-right: 8px;
-    }
-    &:last-child {
-        margin-left: 8px;
-    }
-`;
-
-const Title = styled.h1`
-    font-size: 30px;
-    text-align: center;
-    font-weight: 600;
-`;
-
-const WrapButton = styled.div`
-    display: flex;
-    justify-content: flex-end;
+const ErrorText = styled.span`
+    color: red;
+    font-size: 12px;
 `;

@@ -13,7 +13,7 @@ interface Props {
     onClose: () => void;
     fetchData: () => void;
     onOk: () => void;
-    IdMovieSelect: number;
+    IdMovieSelect?: number;
 }
 
 interface ShowTimeFormData {
@@ -24,7 +24,7 @@ interface ShowTimeFormData {
 }
 
 export interface FormDataShowTime {
-    maPhim: number;
+    maPhim?: number;
     ngayChieuGioChieu: string;
     maRap: string;
     giaVe: number;
@@ -33,7 +33,7 @@ export interface FormDataShowTime {
 export const ShowTimeModal: React.FC<Props> = ({
     visible,
     onClose,
-    IdMovieSelect,
+    IdMovieSelect = undefined,
 }) => {
     const { handleSubmit, control, reset, watch } = useForm<ShowTimeFormData>();
     const { data: rapPhimData, isLoading } = useGetRapPhim();
@@ -87,12 +87,13 @@ export const ShowTimeModal: React.FC<Props> = ({
             maRap: data.cumRap,
             giaVe: data.giaVe,
         };
-        console.log("checkformData: ", formData);
 
         try {
             const res = await createShowTime(formData);
-            console.log(res);
-            toast.success(res.message);
+            if (res && res.statusCode === 200) {
+                toast.success(res.message);
+                onClose();
+            }
         } catch (error: any) {
             toast.error(error.response.data.content);
         }
@@ -186,7 +187,7 @@ export const ShowTimeModal: React.FC<Props> = ({
                                                   )
                                                 : null
                                         }
-                                        onChange={(date, dateString) =>
+                                        onChange={(_, dateString) =>
                                             field.onChange(dateString)
                                         }
                                     />
@@ -231,11 +232,13 @@ export const ShowTimeModal: React.FC<Props> = ({
                                         }
                                         parser={(value) =>
                                             value
-                                                ? value.replace(
-                                                      /\$\s?|(,*)/g,
-                                                      ""
+                                                ? parseInt(
+                                                      value.replace(
+                                                          /\$\s?|(,*)/g,
+                                                          ""
+                                                      )
                                                   )
-                                                : ""
+                                                : 0
                                         }
                                         placeholder="Nhập giá vé"
                                         style={{ width: "100%" }}

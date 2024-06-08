@@ -19,7 +19,8 @@ export const ManageMovie: React.FC = () => {
     const [movieToDelete, setMovieToDelete] = useState<Phim | null>(null);
     const [modalShowTimes, setModalShowTimes] = useState<boolean>(false);
 
-    const [movieEdit, setMovieEdit] = useState<Phim | null>(null);
+    const [idMovieEdit, setIdMovieEdit] = useState<number>();
+    const [movieEdit, setMovieEdit] = useState<Phim>();
     const [movieSelect, setMovieSelect] = useState<number>();
 
     const fetchData = async () => {
@@ -37,6 +38,7 @@ export const ManageMovie: React.FC = () => {
 
     const handleEdit = (record: Phim) => {
         setIsEditModalVisible(true);
+        setIdMovieEdit(record.maPhim);
         setMovieEdit(record);
     };
 
@@ -181,6 +183,7 @@ export const ManageMovie: React.FC = () => {
                 onClose={() => setIsEditModalVisible(false)}
                 fetchData={fetchData}
                 onOk={handleUpdateModalOk}
+                idMovieEdit={idMovieEdit}
                 movieEdit={movieEdit}
             />
             <ShowTimeModal

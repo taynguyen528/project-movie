@@ -1,5 +1,4 @@
 import { Tabs } from "antd";
-import { useGetUserInfo } from "hooks/apiHooks";
 import styled from "styled-components";
 import { TabUserInfo, TicketInfo } from "ui";
 
