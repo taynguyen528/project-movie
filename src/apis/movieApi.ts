@@ -1,4 +1,3 @@
-import { FormDataUpdate } from "components/template/admin/UpdateMovieModal";
 import { QUAN_LY_PHIM_API, QUAN_LY_RAP_API, apiInstance } from "constant";
 
 const apiRap = apiInstance.create({
