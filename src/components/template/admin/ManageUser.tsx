@@ -1,10 +1,10 @@
-import { Table, Button, Space, Input } from "antd";
+import { Table, Button, Space, Input, Modal } from "antd";
 import { deleteUser, getListUser } from "apis/userApi";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import styled from "styled-components";
 import { UpdateUserModal } from "./UpdateUserModal";
-import { AddUserModel } from "./AddUserModel";
+import { AddUserModel } from "./AddUserModal";
 
 const { Search } = Input;
 
@@ -23,6 +23,8 @@ export const ManageUser = () => {
     const [modalUpdateVisible, setModalUpdateVisible] = useState(false);
     const [selectedUser, setSelectedUser] = useState<InfoUser | null>(null);
     const [modalAddNewVisible, setModalAddNewVisible] = useState(false);
+    const [modalDeleteVisible, setModalDeleteVisible] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<InfoUser | null>(null);
 
     const fetchData = async () => {
         try {
@@ -38,12 +40,20 @@ export const ManageUser = () => {
         fetchData();
     }, []);
 
-    const handleDelete = async (taiKhoan: string) => {
+    const showDeleteConfirm = (user: InfoUser) => {
+        setUserToDelete(user);
+        setModalDeleteVisible(true);
+    };
+
+    const handleDelete = async () => {
+        if (!userToDelete) return;
+
         try {
-            const res = await deleteUser(taiKhoan);
+            const res = await deleteUser(userToDelete.taiKhoan);
             if (res.statusCode === 200) {
                 toast.success(res.content);
                 fetchData();
+                setModalDeleteVisible(false);
             }
         } catch (error: any) {
             toast.error(error.response.data.content);
@@ -114,7 +124,7 @@ export const ManageUser = () => {
                         Chỉnh sửa
                     </ButtonUpdateUser>
                     <ButtonDeleteUser
-                        onClick={() => handleDelete(record.taiKhoan)}
+                        onClick={() => showDeleteConfirm(record)}
                     >
                         Xóa
                     </ButtonDeleteUser>
@@ -129,7 +139,7 @@ export const ManageUser = () => {
                 direction="vertical"
                 style={{ width: "100%", marginBottom: "20px" }}
             >
-                <ButtonAddNewUser type="primary" onClick={() => handleAddNewUser()}>
+                <ButtonAddNewUser type="primary" onClick={handleAddNewUser}>
                     Thêm mới người dùng
                 </ButtonAddNewUser>
                 <Search
@@ -157,6 +167,16 @@ export const ManageUser = () => {
                 onClose={() => setModalAddNewVisible(false)}
                 visible={modalAddNewVisible}
             />
+            <Modal
+                title="Xác nhận xóa"
+                visible={modalDeleteVisible}
+                onOk={handleDelete}
+                onCancel={() => setModalDeleteVisible(false)}
+            >
+                <p>
+                    Bạn có chắc chắn muốn xóa người dùng "{userToDelete?.taiKhoan}" không?
+                </p>
+            </Modal>
         </>
     );
 };

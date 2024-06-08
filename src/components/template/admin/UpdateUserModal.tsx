@@ -52,7 +52,6 @@ export const UpdateUserModal: React.FC<Props> = ({
 
         try {
             const res = await updateUserByAdmin(updatedData);
-            console.log("res", res);
             if (res && res.statusCode === 200) {
                 toast.success(res.message);
                 onClose();

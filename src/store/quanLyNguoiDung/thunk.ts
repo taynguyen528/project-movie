@@ -15,7 +15,8 @@ export const registerThunk = createAsyncThunk(
 
             // call API đăng ký tài khoản
             const res = await qlNguoiDungServices.dangKy(payload);
-
+            
+            // console.log("payload: ", payload);
             return res;
         } catch (error) {
             return rejectWithValue(error);

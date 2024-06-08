@@ -1,4 +1,5 @@
-import { AddNewUserInfo } from "components/template/admin/AddUserModel";
+
+import { AddNewUserInfo } from "components/template/admin/AddUserModal";
 import { UserInfo } from "components/template/admin/UpdateUserModal";
 import { QUAN_LY_NGUOI_DUNG_API, apiInstance } from "constant";
 import { IUserUpdate } from "ui";
@@ -52,7 +53,7 @@ const updateInfoUser = async (userInfo: IUserUpdate) => {
     }
 };
 
-const MA_NHOM = "GP02";
+const MA_NHOM = "GP03";
 
 const getListUser = async () => {
     try {
