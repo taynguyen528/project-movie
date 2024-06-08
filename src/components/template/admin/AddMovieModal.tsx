@@ -61,7 +61,7 @@ export const AddMovieModal: React.FC<AddMovieModalProps> = ({
                 onOk();
                 reset();
             }
-        } catch (error) {
+        } catch (error:any) {
             toast.error(error.response.data.content);
         }
     };

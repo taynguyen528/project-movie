@@ -22,7 +22,7 @@ export const UserInfoTemplate = () => {
     //     queryFn: () => qlNguoiDungServices.getUserInfo(),
     // });
 
-    const { data } = useGetUserInfo();
+    // const { data } = useGetUserInfo();
     // nếu user cập nhập thông tin thành công
     // B1: Lưu thông tin mới vào localstorage
     // B2: Set lại giá trị store redux đang lưu userLogin
